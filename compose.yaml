@@ -1,32 +1,45 @@
-version: '3.3'
+# This file is a labor of care set out to help inform on what thiese things do in an easey one stop location for more information please check out https://github.com/itzg as they have a robust documentation pool 
+# covering all of the things you might need to edit this more for your needs. Thanks for stopping bye and taking a little time to read some of this.
 
-services:
-  web:
-    image: itzg/rcon
-    environment:
-      RWA_USERNAME: "(Replace)"                  # Sets Web Rcon login username
-      RWA_PASSWORD: "(Replace)"                  # Sets web login password for RCON
-      RWA_ADMIN: "TRUE"
-      RWA_RCON_HOST: minecraft                   # Is referring to the service name 'minecraft' declared below
-      RWA_RCON_PASSWORD: "(Replace)"             # Must match RCON_PASSWORD below
-    ports:
-      - "4326:4326"                              # RCON connection port
-      - "4327:4327"                              # RCON service port
-    
-  minecraft:
-    image: itzg/minecraft-server:(REPLACE)       # Determine the Java version compatible with your Minecraft server version. Minecraft versions 1.16.4 and older require Java 8 or 11, versions 1.16.5 to 1.19.2 need Java 17, and 1.20+ requires Java 21.
-    stdin_open: true
-    ports:
-      - "25565:25565"                            # Minecraft host port
-    environment:
-      TYPE: "AUTO_CURSEFORGE"                    # Only use this line for Modded Servers
-      CF_API_KEY: "(Replace)"                    # Curseforge developer api key
-      CF_PAGE_URL: "(Replace)"                   # Modpack version url from Curseforge
-      MEMORY: "(Replace)"                        # Memory needed to run the modpack #G for gigabytes
-      VERSION: "(Replace)"                       # Version of Minecraft required for the modpack
-      EULA: "TRUE"
-      RCON_PASSWORD: "(Replace)"                 # Must match RWA_RCON_PASSWORD above
-      # CF_EXCLUDE_MODS: "(Replace)"             # used for client side mods and is replaced by Curseforge mod ID number
-    volumes:
-      - (Replace):/data                          # Replace for corrected install directory
-    restart: unless-stopped                      # Container run options
+version: '3.3'                                  # This is the version of docker compose that this file points to. This is just a notation and is more of a standard writing practise of docker compose then it is useful.
+
+# This first section sets up a docker container for a self hosted RCON client for server management. This comes in handy when trying to work on background tasks like noderating your own server.
+
+services:                                        # This is what programs are called inside of a docker compose file.
+  web:                                           # This is name of the service package for the RCON web interface.
+    image: itzg/rcon                             # This is the image for an RCON web interface found from this individual, https://github.com/itzg, please show them some respect as they empowered the creation of this file
+    environment:                                 # This marks the start of the environment variable table for the RCON web interface.
+      RWA_USERNAME: "(Replace)"                  # Sets the RCON web interface login username.
+      RWA_PASSWORD: "(Replace)"                  # Sets the RCON web interface login password.
+      RWA_ADMIN: "TRUE"                          # This assigns the account created in the last 2 lines as an admin account for management over the web GUI of the RCON web interface.
+      RWA_RCON_HOST: minecraft                   # this refers to the service name 'minecraft' declared below and attaches this docker comtainer to the minecraft container for interoperation.
+      RWA_RCON_PASSWORD: "(Replace)"             # Must match RCON_PASSWORD below so the the RCON web interface can log into your minecraft servers RCON system.
+    ports:                                       # This header notates that this service mentioned above called "web" is going to be listening on the following ports for connection.
+      - "4326:4326"                              # RCON connection port. This is what is listening for your login attempt with the above account.
+      - "4327:4327"                              # RCON service port. This is the port that is going to talk with the Minecraft server you create below.
+
+# This next section sets up the actual Minecraft server. This can be run anywhere that docker compose is installed and works great.  Again I would like to thank https://github.com/itzg for such great repositories making
+# entire file even possible. Go drop by and check out their page if you get a chance.
+
+  minecraft:                                     # This is name of the service package for Minecraft you can change it but remember to change the one above in RWA_RCON_HOST if you do.
+    image: itzg/minecraft-server:(REPLACE)       # (options= java8 ; java11 ; java17 ; java21) Determine the Java version compatible with your Minecraft server version. Minecraft versions 1.16.4 and older require 
+                                                 # Java 8 or 11, versions 1.16.5 to 1.19.2 need Java 17, and 1.20+ requires Java 21.
+    stdin_open: "TRUE"                           # This acts like the -i docker run augment allowing you to use files exterally. 
+    ports:                                       # This header notates that this app mentioned above called "minecraft" is going to be listening on the following ports for connection.
+      - "25565:25565"                            # Minecraft player connection port (Default is 25565:25565 tcp). Minecraft servers listen on the port listed here for play logins and play commands.
+    environment:                                 # This section starts the environment variable table to allow for differences on your server all of the variables from the minecraft server.properties
+                                                 # file can be added below.
+      TYPE: "AUTO_CURSEFORGE"                    # Only use this line for Modded Servers this tell the server to pull whatever type of modloader is needed to run the modpack your using.
+      CF_API_KEY: "(Replace)"                    # Curseforge developer api key. This allows the server access to download the mods for your modpack defined in the next line.
+      CF_PAGE_URL: "(Replace)"                   # Modpack version url from Curseforge. This points the server where to download the modpack your wanting to use. please use the right click copy address address of the
+                                                 # actual modpack zip file your trying to use.
+      MEMORY: "(Replace)"                        # Memory needed to run the modpack #G for gigabytes. This is the server maximum Ram allocation. (reccommeded a minimum of 4G)
+      VERSION: "(Replace)"                       # Version of Minecraft required for the modpack. noting it here will pull the correct minecraft server image for your modpack during the download.
+      EULA: "TRUE"                               # Designates that you agree to the EULA of Minecraft which is the only way to get the server to start.
+      RCON_PASSWORD: "(Replace)"                 # Must match RWA_RCON_PASSWORD above. Used to allow the RCON web interface to access your Minecraft server.
+    # CF_EXCLUDE_MODS: "(Replace)"               # Used for client side mods and is replaced by Curseforge mod ID numbers. Remove # in front of CF_EXCLUDE_MODS to enable if needed.
+    volumes:                                     # This is used to point to a specific location on the system that is running docker that you want the server to be stored.
+      - (Replace):/data                          # Replace for corrected install directory. ** REMEMBER TO MAKE THE FOLDER BEFORE RUNNING THIS COMPOSE FILE **
+    restart: unless-stopped                      # This causes the Minecraft server to restart upon a crash unless you stop it on purpose. (Options= none ; unless-stopped ; on-failure ; always) 
+
+#This is the end of the file thank you for taking the time to read hope it helps to be labelled this way. Thanks again to https://github.com/itzg for such an amazing repository. Hope everone learned something today.
