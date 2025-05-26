@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+  web:
+    image: itzg/rcon
+    environment:
+      RWA_USERNAME: "(Replace)"                  # Sets Web Rcon login username
+      RWA_PASSWORD: "(Replace)"                  # Sets web login password for RCON
+      RWA_ADMIN: "TRUE"
+      RWA_RCON_HOST: minecraft                   # Is referring to the service name 'minecraft' declared below
+      RWA_RCON_PASSWORD: "(Replace)"             # Must match RCON_PASSWORD below
+    ports:
+      - "4326:4326"                              # RCON connection port
+      - "4327:4327"                              # RCON service port
+    
+  minecraft:
+    image: itzg/minecraft-server:(REPLACE)       # Determine the Java version compatible with your Minecraft server version. Minecraft versions 1.16.4 and older require Java 8 or 11, versions 1.16.5 to 1.19.2 need Java 17, and 1.20+ requires Java 21.
+    stdin_open: true
+    ports:
+      - "25565:25565"                            # Minecraft host port
+    environment:
+      TYPE: "AUTO_CURSEFORGE"                    # Only use this line for Modded Servers
+      CF_API_KEY: "(Replace)"                    # Curseforge developer api key
+      CF_PAGE_URL: "(Replace)"                   # Modpack version url from Curseforge
+      MEMORY: "(Replace)"                        # Memory needed to run the modpack #G for gigabytes
+      VERSION: "(Replace)"                       # Version of Minecraft required for the modpack
+      EULA: "TRUE"
+      RCON_PASSWORD: "(Replace)"                 # Must match RWA_RCON_PASSWORD above
+      # CF_EXCLUDE_MODS: "(Replace)"             # used for client side mods and is replaced by Curseforge mod ID number
+    volumes:
+      - (Replace):/data                          # Replace for corrected install directory
+    restart: unless-stopped                      # Container run options
