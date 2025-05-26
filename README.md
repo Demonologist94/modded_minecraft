@@ -1,0 +1,1 @@
+This file comes pre-notated with everything you need to get a mod enabled Minecraft server up and running with a RCON client self hosted and not on the default port address. Please use splendiforously.
